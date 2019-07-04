@@ -88,6 +88,7 @@ ${LL_DIR}/lanelet2_routing/include/lanelet2_routing
 ${mrt_INCLUDE_DIRS}
 ${catkin_INCLUDE_DIRS}
 ${AW_DIR}/ros/install/autoware_msgs/include
+src
 )
 
 
@@ -111,6 +112,7 @@ set(PUGI_LIB /usr/lib/x86_64-linux-gnu/libpugixml.so)
 
 add_executable(lanelet_map_loader_xml
   src/lanelet_map_loader_xml.cpp src/rosUTM.cpp
+  src/mgrs_projector.cpp
   src/libLaneletMap.cpp
   ${LL_DIR}/lanelet2_projection/src/UTM.cpp
   ${ll_io_src}
@@ -128,9 +130,30 @@ target_link_libraries(lanelet_map_loader_xml
   ${PUGI_LIB}
   ${Boost_LIBRARIES}
   )
+add_executable(lanelet_map_loader_bin
+  src/lanelet_map_loader_bin.cpp src/rosUTM.cpp
+  src/mgrs_projector.cpp
+  src/libLaneletMap.cpp
+  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
+  ${ll_io_src}
+  ${ll_core_src}
+  ${ll_core_h}
+  ${ll_tfr_src}
+  ${ll_tfr_h}
+  ${ll_rt_src}
+  ${ll_rt_h}
+  ${PUGI_DEFS}
+  )
+target_link_libraries(lanelet_map_loader_bin
+  ${catkin_LIBRARIES}
+  ${GeographicLib_LIBRARIES}
+  ${PUGI_LIB}
+  ${Boost_LIBRARIES}
+  )
 
 
 add_executable(lanelet_map_subscriber_xml
+  src/mgrs_projector.cpp
   src/lanelet_map_subscriber_xml.cpp src/rosUTM.cpp
   src/libLaneletMap.cpp
   ${LL_DIR}/lanelet2_projection/src/UTM.cpp
@@ -144,6 +167,27 @@ add_executable(lanelet_map_subscriber_xml
   ${PUGI_DEFS}
   )
 target_link_libraries(lanelet_map_subscriber_xml
+  ${catkin_LIBRARIES}
+  ${GeographicLib_LIBRARIES}
+  ${PUGI_LIB}
+  ${Boost_LIBRARIES}
+  )
+
+add_executable(lanelet_map_visualization
+  src/lanelet_map_visualization.cpp src/rosUTM.cpp
+  src/libLaneletMap.cpp
+  src/mgrs_projector.cpp
+  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
+  ${ll_io_src}
+  ${ll_core_src}
+  ${ll_core_h}
+  ${ll_tfr_src}
+  ${ll_tfr_h}
+  ${ll_rt_src}
+  ${ll_rt_h}
+  ${PUGI_DEFS}
+  )
+target_link_libraries(lanelet_map_visualization
   ${catkin_LIBRARIES}
   ${GeographicLib_LIBRARIES}
   ${PUGI_LIB}

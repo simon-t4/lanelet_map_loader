@@ -1,0 +1,6 @@
+<launch>
+
+ <node pkg="lanelet_map_loader" type="lanelet_map_loader" name="lanelet_map_loader" output="log">
+ </node>
+
+</launch>

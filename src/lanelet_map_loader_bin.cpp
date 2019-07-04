@@ -100,19 +100,24 @@ int main (int argc, char **argv)
   ros::NodeHandle rosnode;
   
   // publisher to visualise lanelet elements within rviz
-  ros::Publisher map_xml_pub = rosnode.advertise<lanelet_msgs::MapXML>("/lanelet_map_xml", 1, true);
+  //  ros::Publisher map_xml_pub = rosnode.advertise<lanelet_msgs::MapXML>("/lanelet_map_xml", 1, true);
+  ros::Publisher map_bin_pub = rosnode.advertise<lanelet_msgs::MapBin>("/lanelet_map_bin", 1, true);
 
-  lanelet_msgs::MapXML map_xml_msg;
-  int status = lanelet_utils::Map::toXMLMsg(map, map_xml_msg, ros_projector);
+  //  lanelet_msgs::MapXML map_xml_msg;
+  lanelet_msgs::MapBin map_bin_msg;
+  //  int status = lanelet_utils::Map::toXMLMsg(map, map_xml_msg, ros_projector);
 
+  lanelet_utils::Map::toBinMsg(map, map_bin_msg);
+  
 
   ros::spinOnce();
   // main loop
 
   ros::Rate loop_rate(10);  
   int loop_count = 0;
-       
-  map_xml_pub.publish(map_xml_msg);
+  
+  //map_xml_pub.publish(map_xml_msg);
+  map_bin_pub.publish(map_bin_msg);
 
   while(ros::ok()) // && loop_count < 10)
     {

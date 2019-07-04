@@ -2,7 +2,7 @@
 <package format="2">
   <name>lanelet_map_loader</name>
   <version>0.0.0</version>
-  <description> test various lanelet2 prototype package</description>
+  <description> load a lanelet2 map and publish it for other nodes to read</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
