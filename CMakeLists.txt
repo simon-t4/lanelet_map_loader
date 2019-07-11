@@ -1,20 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(lanelet_map_loader)
 
-
-
-set(LL_DIR /home/simon/work/catkin_ws/src/lanelet2)
 set(AW_DIR /home/simon/Autoware)
-set(autoware_msgs_DIR ${AW_DIR}/ros/install/autoware_msgs/share/autoware_msgs/cmake)
 
 find_package(autoware_msgs REQUIRED)
-
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
   tf
+  geodesy
 #  message_generation
 )
 
@@ -33,10 +29,6 @@ include(UseMrtAutoTarget)
 include(GatherDeps)
 
 
-
-
-
-
 find_package(AutoDeps REQUIRED COMPONENTS ${DEPENDEND_PACKAGES})
 mrt_add_to_ide(README.md .gitlab-ci.yml)
 
@@ -47,6 +39,7 @@ add_definitions(-DPKG_DIR="${CMAKE_CURRENT_LIST_DIR}")
 
 
 catkin_package(
+ INCLUDE_DIRS
 CATKIN_DEPENDS message_runtime roscpp rospy std_msgs geodesy
 #  DEPENDS system_lib
 )
@@ -65,26 +58,12 @@ find_package (GeographicLib 1.34 REQUIRED)
 
 include_directories (${GeographicLib_INCLUDE_DIRS})
     add_definitions (${GeographicLib_DEFINITIONS})
-
-find_package(Boost COMPONENTS serialization system)
     
-#include(rosbuild)
-#rosbuild_init()
-#rosbuild_genmsg()
+find_package(Boost COMPONENTS serialization system)
 
 include_directories(
-# include
+include
 /usr/include/eigen3
-${LL_DIR}/lanelet2_core/include
-${LL_DIR}/lanelet2_core/include/lanelet2_core
-${LL_DIR}/lanelet2_io/include
-${LL_DIR}/lanelet2_io/include/lanelet2_io
-${LL_DIR}/lanelet2_projection/include
-${LL_DIR}/lanelet2_projection/include/lanelet2_projection
-${LL_DIR}/lanelet2_traffic_rules/include
-${LL_DIR}/lanelet2_traffic_rules/include/lanelet2_traffic_rules
-${LL_DIR}/lanelet2_routing/include
-${LL_DIR}/lanelet2_routing/include/lanelet2_routing
 ${mrt_INCLUDE_DIRS}
 ${catkin_INCLUDE_DIRS}
 ${AW_DIR}/ros/install/autoware_msgs/include
@@ -96,101 +75,73 @@ link_directories(
 ${mrt_LIBRARY_DIRS}
 )
 
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  geodesy
+  lanelet2_core
+  lanelet2_io
+  lanelet2_maps
+  lanelet2_projection
+  lanelet2_routing
+  lanelet2_traffic_rules
+  lanelet2_validation
+  lanelet2_msgs
+)
 
-file (GLOB_RECURSE ll_io_src ${LL_DIR}/lanelet2_io/src/*.cpp)
-file (GLOB_RECURSE ll_core_src ${LL_DIR}/lanelet2_core/src/*.cpp)
-file (GLOB_RECURSE ll_core_h ${LL_DIR}/lanelet2_core/include/*.h)
-file (GLOB_RECURSE ll_tfr_src ${LL_DIR}/lanelet2_traffic_rules/src/*.cpp)
-file (GLOB_RECURSE ll_tfr_h ${LL_DIR}/lanelet2_traffic_rules/include/*.h)
-file (GLOB_RECURSE ll_rt_src ${LL_DIR}/lanelet2_routing/src/*.cpp)
-file (GLOB_RECURSE ll_rt_h ${LL_DIR}/lanelet2_routing/include/*.h)
+catkin_package(
+  #  INCLUDES_DIR include
+  LIBRARIES lanelet2_extension_lib
+  CATKIN_DEPENDS roscpp geodesy lanelet2_core lanelet2_io lanelet2_maps lanelet2_projection lanelet2_routing lanelet2_traffic_rules lanelet2_validation lanelet2_msgs
+)
 
-file (GLOB PUGI_DEFS /usr/include/pugi*.hpp)
-set(PUGI_LIB /usr/lib/x86_64-linux-gnu/libpugixml.so)
+include_directories(
+  include
+  ${GeographLib_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+)
 
+### lanelet_map_loader
 
-
-add_executable(lanelet_map_loader_xml
-  src/lanelet_map_loader_xml.cpp src/rosUTM.cpp
-  src/mgrs_projector.cpp
-  src/libLaneletMap.cpp
-  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
-  ${ll_io_src}
-  ${ll_core_src}
-  ${ll_core_h}
-  ${ll_tfr_src}
-  ${ll_tfr_h}
-  ${ll_rt_src}
-  ${ll_rt_h}
-  ${PUGI_DEFS}
-  )
-target_link_libraries(lanelet_map_loader_xml
-  ${catkin_LIBRARIES}
-  ${GeographicLib_LIBRARIES}
-  ${PUGI_LIB}
-  ${Boost_LIBRARIES}
-  )
 add_executable(lanelet_map_loader_bin
-  src/lanelet_map_loader_bin.cpp src/rosUTM.cpp
-  src/mgrs_projector.cpp
-  src/libLaneletMap.cpp
-  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
-  ${ll_io_src}
-  ${ll_core_src}
-  ${ll_core_h}
-  ${ll_tfr_src}
-  ${ll_tfr_h}
-  ${ll_rt_src}
-  ${ll_rt_h}
-  ${PUGI_DEFS}
+  src/lanelet_map_loader_bin.cpp
   )
 target_link_libraries(lanelet_map_loader_bin
   ${catkin_LIBRARIES}
   ${GeographicLib_LIBRARIES}
-  ${PUGI_LIB}
   ${Boost_LIBRARIES}
+  lanelet2_extension_lib
+  )
+target_include_directories(lanelet_map_loader_bin
+  PRIVATE /home/simon/work/catkin_ws/src/lanelet2_extension/include
   )
 
+### lanelet_map_subscriber_bin
 
-add_executable(lanelet_map_subscriber_xml
-  src/mgrs_projector.cpp
-  src/lanelet_map_subscriber_xml.cpp src/rosUTM.cpp
-  src/libLaneletMap.cpp
-  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
-  ${ll_io_src}
-  ${ll_core_src}
-  ${ll_core_h}
-  ${ll_tfr_src}
-  ${ll_tfr_h}
-  ${ll_rt_src}
-  ${ll_rt_h}
-  ${PUGI_DEFS}
+add_executable(lanelet_map_subscriber_bin
+  src/lanelet_map_subscriber_bin.cpp
   )
-target_link_libraries(lanelet_map_subscriber_xml
+target_link_libraries(lanelet_map_subscriber_bin
   ${catkin_LIBRARIES}
   ${GeographicLib_LIBRARIES}
-  ${PUGI_LIB}
   ${Boost_LIBRARIES}
+  lanelet2_extension_lib
+  )
+target_include_directories(lanelet_map_subscriber_bin
+  PRIVATE /home/simon/work/catkin_ws/src/lanelet2_extension/include
   )
 
+
+### lanelet_map_visualization
+
 add_executable(lanelet_map_visualization
-  src/lanelet_map_visualization.cpp src/rosUTM.cpp
-  src/libLaneletMap.cpp
-  src/mgrs_projector.cpp
-  ${LL_DIR}/lanelet2_projection/src/UTM.cpp
-  ${ll_io_src}
-  ${ll_core_src}
-  ${ll_core_h}
-  ${ll_tfr_src}
-  ${ll_tfr_h}
-  ${ll_rt_src}
-  ${ll_rt_h}
-  ${PUGI_DEFS}
+  src/lanelet_map_visualization.cpp
   )
 target_link_libraries(lanelet_map_visualization
   ${catkin_LIBRARIES}
   ${GeographicLib_LIBRARIES}
-  ${PUGI_LIB}
   ${Boost_LIBRARIES}
+  lanelet2_extension_lib
   )
-
+target_include_directories(lanelet_map_visualization
+  PRIVATE /home/simon/work/catkin_ws/src/lanelet2_extension/include
+  )

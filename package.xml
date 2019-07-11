@@ -53,7 +53,7 @@
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
-  <build_depend>lanelet_msgs</build_depend>
+<!--  <build_depend>lanelet_msgs</build_depend>-->
   <build_depend>tf</build_depend>
   <build_depend>geodesy</build_depend>
   <build_export_depend>roscpp</build_export_depend>
@@ -62,11 +62,38 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-  <exec_depend>lanelet_msgs</exec_depend>
+ <!-- <exec_depend>lanelet_msgs</exec_depend>-->
   <exec_depend>tf</exec_depend>
  <exec_depend>geodesy</exec_depend>
 
-  
+
+
+ <build_depend>lanelet2_core</build_depend>
+ <build_depend>lanelet2_io</build_depend>
+ <build_depend>lanelet2_maps</build_depend>
+ <build_depend>lanelet2_projection</build_depend>
+ <build_depend>lanelet2_routing</build_depend>
+ <build_depend>lanelet2_traffic_rules</build_depend>
+ <build_depend>lanelet2_validation</build_depend>
+ <build_depend>lanelet2_msgs</build_depend>
+ <build_export_depend>lanelet2_core</build_export_depend>
+ <build_export_depend>lanelet2_io</build_export_depend>
+ <build_export_depend>lanelet2_maps</build_export_depend>
+ <build_export_depend>lanelet2_projection</build_export_depend>
+ <build_export_depend>lanelet2_routing</build_export_depend>
+ <build_export_depend>lanelet2_traffic_rules</build_export_depend>
+ <build_export_depend>lanelet2_validation</build_export_depend>
+ <build_export_depend>lanelet2_msgs</build_export_depend>
+ <exec_depend>lanelet2_core</exec_depend>
+ <exec_depend>lanelet2_io</exec_depend>
+ <exec_depend>lanelet2_maps</exec_depend>
+ <exec_depend>lanelet2_projection</exec_depend>
+ <exec_depend>lanelet2_routing</exec_depend>
+ <exec_depend>lanelet2_traffic_rules</exec_depend>
+ <exec_depend>lanelet2_validation</exec_depend>
+ <exec_depend>lanelet2_msgs</exec_depend>
+ 
+ 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

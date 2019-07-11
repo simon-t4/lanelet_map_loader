@@ -42,20 +42,24 @@
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <Eigen/Eigen>
 
-#include <autoware_msgs/Signals.h>
+//#include <autoware_msgs/Signals.h>
 
 #include <cstdio>
 
 #include <sstream>
-#include "rosUTM.h"
-#include "libLaneletMap.h"
-#include <lanelet_msgs/PointArray.h>
-#include <lanelet_msgs/MapXML.h>
-#include <pugixml.hpp>
+//#include "rosUTM.h"
+//#include "libLaneletMap.h"
+//#include <lanelet_msgs/PointArray.h>
+//#include <lanelet_msgs/MapXML.h>
+//#include <pugixml.hpp>
 
 
+#include <lanelet2_extension/io/message_conversion.hpp>
 
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_msgs/MapBin.h>
 
+#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
 
 #include <unistd.h>
 #include <ios>
@@ -86,9 +90,37 @@ lanelet::LaneletMapPtr lanelet_map;
 //
 //-------------------------------------------------------------------------
 
-void xmlMapCallback(lanelet_msgs::MapXML msg)
+void binMapCallback(lanelet2_msgs::MapBin msg)
 {
-  int status = lanelet_utils::Map::fromXMLMsg(msg, lanelet_map);
+ lanelet_utils::Map::fromBinMsg(msg, lanelet_map);
+ for ( auto lanelet: lanelet_map->laneletLayer )
+   {
+     //You can access to traffic light element as AutowareTrafficLight class
+     auto autoware_traffic_lights = lanelet.regulatoryElementsAs<lanelet::autoware::AutowareTrafficLight>();
+     if(autoware_traffic_lights.empty()) continue;
+     for (auto light: autoware_traffic_lights)
+       {
+	 std::cout << "light_bulbs: ";
+	 for(auto light_string: light->lightBulbs() )
+	   {
+	     std::cout << light_string.id() << " ";
+	   }
+	 std::cout << std::endl;
+       }
+     //You can also access to traffic light element as default TrafficLight class
+     auto traffic_lights = lanelet.regulatoryElementsAs<lanelet::TrafficLight>();
+     for (auto light: traffic_lights)
+       {
+	 std::cout << "traffic lights: ";
+	 for(auto light_string: light->trafficLights() )
+	   {
+	     std::cout << light_string.id() << " ";
+	   }
+	 std::cout << std::endl;
+       }
+     std::cout << std::endl;
+   }
+ 
 }
 //-------------------------------------------------------------------------
 //
@@ -103,7 +135,7 @@ int main (int argc, char **argv)
   ros::init(argc, argv, "lanelet_map_subscriber");  
   ros::NodeHandle rosnode;
   
-  ros::Subscriber xml_map_sub = rosnode.subscribe("/lanelet_map_xml", 10000,  xmlMapCallback);
+  ros::Subscriber xml_map_sub = rosnode.subscribe("/lanelet_map_bin", 10000,  binMapCallback);
 
   
     

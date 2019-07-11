@@ -51,14 +51,17 @@
 
 #include <sstream>
 #include "rosUTM.h"
+#include <lanelet2_extension/io/message_conversion.hpp>
 
-#include "mgrs_projector.hpp"
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
 
-#include "libLaneletMap.h"
+//#include "libLaneletMap.h"
 
-#include <lanelet_msgs/PointArray.h>
-#include <lanelet_msgs/MapXML.h>
-#include <pugixml.hpp>
+//#include <lanelet_msgs/PointArray.h>
+//#include <lanelet_msgs/MapXML.h>
+#include <lanelet2_msgs/MapBin.h>
+
+//#include <pugixml.hpp>
 
 #include <unistd.h>
 #include <ios>
@@ -67,16 +70,10 @@
 #include <string>
 //using namespace lanelet;
 
-#define TL_BY_LANELET 0
-#define TL_BY_NEAREST 1
-
-#define signalLampRadius 0.3
-
-static std::string camera_id_str;
-
 
 //std::string example_map_path = "/home/simon/work/catkin_ws/src/lanelet2/lanelet2_maps/res/mapping_example.osm";
-std::string example_map_path = "/home/simon/work/peoria_data/map/Lanelet2/Peoria_0301_2019_fixed_edit.osm";
+//std::string example_map_path = "/home/simon/work/peoria_data/map/Lanelet2/Peoria_0301_2019_fixed_edit.osm";
+std::string example_map_path = "/home/simon/work/peoria_data/map/Autoware_lanelet2/Peoria_autoware_lanelet_20190702.osm";
 
 
 //-------------------------------------------------------------------------
@@ -89,22 +86,28 @@ int main (int argc, char **argv)
 {
 
   // UTM 1KM BLOCK
-  lanelet::Origin origin({0,0});
+  //  lanelet::Origin origin({0,0});
 
   // origin not used in projector but projector template requires one
-  lanelet::projection::RosUtmProjector ros_projector(origin);
+  // lanelet::projection::RosUtmProjector ros_projector(origin);
+
+
+
   lanelet::ErrorMessages errors;
-  lanelet::LaneletMapPtr map = load(example_map_path, ros_projector, &errors);
+
+
+  lanelet::projection::MGRSProjector projector;
+  lanelet::LaneletMapPtr map = load(example_map_path, projector, &errors);
  
   ros::init(argc, argv, "lanelet_map_loader");  
   ros::NodeHandle rosnode;
   
   // publisher to visualise lanelet elements within rviz
   //  ros::Publisher map_xml_pub = rosnode.advertise<lanelet_msgs::MapXML>("/lanelet_map_xml", 1, true);
-  ros::Publisher map_bin_pub = rosnode.advertise<lanelet_msgs::MapBin>("/lanelet_map_bin", 1, true);
+  ros::Publisher map_bin_pub = rosnode.advertise<lanelet2_msgs::MapBin>("/lanelet_map_bin", 1, true);
 
   //  lanelet_msgs::MapXML map_xml_msg;
-  lanelet_msgs::MapBin map_bin_msg;
+  lanelet2_msgs::MapBin map_bin_msg;
   //  int status = lanelet_utils::Map::toXMLMsg(map, map_xml_msg, ros_projector);
 
   lanelet_utils::Map::toBinMsg(map, map_bin_msg);
